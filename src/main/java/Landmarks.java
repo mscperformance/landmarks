@@ -1,6 +1,8 @@
 import fr.uga.pddl4j.encoding.CodedProblem;
 import fr.uga.pddl4j.parser.ErrorManager;
 import fr.uga.pddl4j.planners.ProblemFactory;
+import fr.uga.pddl4j.planners.ff.FF;
+import fr.uga.pddl4j.planners.hc.EHC;
 import fr.uga.pddl4j.planners.hsp.HSP;
 import fr.uga.pddl4j.util.BitOp;
 import fr.uga.pddl4j.util.BitState;
@@ -33,18 +35,9 @@ public class Landmarks {
             // Encode and simplify the planning problem in a compact representation
             final CodedProblem pb = factory.encode();
 
-            System.out.println("Constants " + pb.getConstants());
-            System.out.println( pb.toString(pb.getInit()));
-
             BitState init = new BitState(pb.getInit());
-            System.out.println("Init "  + pb.toString(pb.getInit()));
-            System.out.println("Goal " + pb.toString(pb.getGoal()));
 
 
-            System.out.println("Predicates " + pb.getPredicates());
-            System.out.println(pb.getPredicatesSignatures());
-
-            System.out.println("Operators " + pb.getOperators());
 
             if (!pb.isSolvable()) {
                 System.out.println("goal can be simplified to FALSE. "
@@ -56,9 +49,13 @@ public class Landmarks {
             final RPGL planner= new RPGL();
 
             // Create the planner
-//            final HSP planner = new HSP();
-            //final FF planner = new FF();
-            //final EHC planner = new EHC();
+            final HSP planner3 = new HSP();
+            final FF planner2 = new FF();
+            planner2.search(pb);
+            final EHC planner4 = new EHC();
+            planner3.search(pb);
+            planner4.search(pb);
+
 
             // Search for a solution plan
             final Plan plan = planner.search(pb);
