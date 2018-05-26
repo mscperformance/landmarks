@@ -27,21 +27,13 @@ import fr.uga.pddl4j.planners.ProblemFactory;
 import fr.uga.pddl4j.planners.Statistics;
 import fr.uga.pddl4j.planners.hsp.Node;
 import fr.uga.pddl4j.planners.hsp.NodeComparator;
-import fr.uga.pddl4j.util.BitOp;
-import fr.uga.pddl4j.util.BitState;
-import fr.uga.pddl4j.util.MemoryAgent;
-import fr.uga.pddl4j.util.Plan;
-import fr.uga.pddl4j.util.SequentialPlan;
+import fr.uga.pddl4j.util.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
-import java.util.PriorityQueue;
-import java.util.Properties;
+import java.util.*;
 
 
 /**
@@ -156,6 +148,50 @@ public final class RPGL extends AbstractPlanner {
      */
     @Override
     public SequentialPlan search(final CodedProblem problem) {
+
+
+        // Get the initial state from the planning problem
+        BitState s0 = new BitState(problem.getInit());
+        BitState g = new BitState(problem.getGoal()); //.getGoal girizei BitExp
+        System.out.println("s0-->"+s0);
+        System.out.println("g-->"+g);
+        if ( s0.satisfy(problem.getGoal()) ) {
+
+        }
+
+        Objects.requireNonNull(problem);
+        final long begin = System.currentTimeMillis();
+        final Heuristic heuristic = HeuristicToolKit.createHeuristic(this.getHeuristicType(), problem);
+
+        // Initialize the opened list (store the pending node)
+        final double currWeight = this.weight;
+        // The list stores the node ordered according to the A* (getFValue = g + h) function
+        final PriorityQueue<Node> queue = new PriorityQueue<>(100, new NodeComparator(currWeight));
+        // Creates the root node of the tree search
+        final Node root = new Node(s0, null, -1, 0, heuristic.estimate(s0, problem.getGoal()));
+        // Adds the root to the list of pending nodes
+        queue.add(root);
+
+        SequentialPlan Landmarks = null;
+
+        //Node z = queue.peek();
+        //System.out.println(z.nextSetBit(6)+" z<---");
+
+        final Map<BitState, Node> queue2 = new HashMap<>();
+        queue2.put(s0,root);
+
+
+        final Node current = queue.poll();
+
+
+        System.out.println(queue2+"");
+
+
+        return Landmarks;
+
+
+
+/*
         Objects.requireNonNull(problem);
         final long begin = System.currentTimeMillis();
         final Heuristic heuristic = HeuristicToolKit.createHeuristic(this.getHeuristicType(), problem);
@@ -178,11 +214,16 @@ public final class RPGL extends AbstractPlanner {
 
         final int timeout = this.getTimeout() * 1000;
         long time = 0;
+
+        System.out.println("s0-->"+ new BitState(problem.getInit()));
+        System.out.println("g-->"+ new BitState(problem.getGoal()));
         // Start of the search
         while (!open.isEmpty() && plan == null && time < timeout) {
 
             // Pop the first node in the pending list open
             final Node current = open.poll();
+            System.out.println("CURRENT-->"+current);
+
             openSet.remove(current);
             closeSet.put(current, current);
             System.out.println("asdasdsad " + open.poll());
@@ -252,6 +293,7 @@ public final class RPGL extends AbstractPlanner {
         }
         // return the search computed or null if no search was found
         return plan;
+*/
     }
 
     /**
